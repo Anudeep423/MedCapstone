@@ -1,25 +1,25 @@
 require("dotenv").config();
 const express = require("express");
 const mongoose = require("mongoose");
-const bodyParser = require('body-parser');
-const jwt = require('jsonwebtoken');
+const bodyParser = require("body-parser");
+const jwt = require("jsonwebtoken");
 const app = express();
-const cors = require('cors');
-const createError = require('http-errors');
-const usersRouter = require('./routes/users');
-const catalogRouter = require('./routes/catalog');
+const cors = require("cors");
+const createError = require("http-errors");
+const usersRouter = require("./routes/users");
+const catalogRouter = require("./routes/catalog");
 const hospRouter = require("./routes/Hosp");
-const path = require('path');
-const secret = process.env.JWT_SECRET || "local_dev"
+const path = require("path");
+const secret = process.env.JWT_SECRET || "local_dev";
 
 app.use(cors());
 app.use(express.json());
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({extended: true}));
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', '*');
-  if (req.method === 'OPTIONS') {
-    res.header('Access-Control-Allow-Methods', 'PUT, POST, PATCH, DELETE, GET');
+  res.header("Access-Control-Allow-Origin", "*");
+  if (req.method === "OPTIONS") {
+    res.header("Access-Control-Allow-Methods", "PUT, POST, PATCH, DELETE, GET");
     return res.status(200).json({});
   }
   next();
@@ -27,12 +27,11 @@ app.use((req, res, next) => {
 
 const PORT = process.env.PORT || 8000;
 
-app.use(express.static(path.join(__dirname, "capstoneFrontend", "build")))
+app.use(express.static(path.join(__dirname, "capstoneFrontend", "build")));
 
-app.get("*", (req, res) => {
-    res.sendFile(path.join(__dirname, "capstoneFrontend", "build", "index.html"));
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "capstoneFrontend", "build", "index.html"));
 });
-
 
 app.listen(PORT, () => console.log(`The server has started on port: ${PORT}`));
 
@@ -52,44 +51,40 @@ mongoose.connect(
   }
 );
 
-
 function validateUser(req, res, next) {
-    jwt.verify(req.headers['x-access-token'], secret, function(err, decoded) {
-      if (err) {
-        res.json({status:"error", message: err.message, data: null});
-      }else{
-        // add user id to request
-        req.body.id = decoded.id;
-        res.locals.id = decoded.id;
-        next();
-      }
-    });
-    
-  }
+  jwt.verify(req.headers["x-access-token"], secret, function (err, decoded) {
+    if (err) {
+      res.json({ status: "error", message: err.message, data: null });
+    } else {
+      // add user id to request
+      req.body.id = decoded.id;
+      res.locals.id = decoded.id;
+      next();
+    }
+  });
+}
 
-app.use('/users', usersRouter);
+app.use("/users", usersRouter);
 
-app.use('/catalog', catalogRouter);
+app.use("/catalog", catalogRouter);
 
-app.use("/api",hospRouter)
-
+app.use("/api", hospRouter);
 
 // catch 404 and forward to error handler
-app.use(function(req, res, next) {
+app.use(function (req, res, next) {
   next(createError(404));
 });
 
 // error handler
-app.use(function(err, req, res, next) {
+app.use(function (err, req, res, next) {
   // set locals, only providing error in development
   res.locals.message = err.message;
-  res.locals.error = req.app.get('env') === 'development' ? err : {};
- 
+  res.locals.error = req.app.get("env") === "development" ? err : {};
+
   // render the error page
   res.status(err.status || 500);
   res.json({
     message: err.message,
-    error: err
+    error: err,
   });
-  
 });
