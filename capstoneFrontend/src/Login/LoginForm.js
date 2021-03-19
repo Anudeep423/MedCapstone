@@ -8,8 +8,8 @@ import Navbar from "../Landing Page/Navbar";
 //import Footer from '../Landing Page/Footer'
 function LoginForm(props) {
   const [values, setValues] = useState({
-    email: "",
-    password: "",
+    email: "paul@gmail.com",
+    password: "123456",
     error: "",
     success: "",
     performRedirect: false,
